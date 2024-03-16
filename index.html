@@ -1,127 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Professional Socket.IO Chat</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket IO chat</title>
     <style>
-      body {
-        margin: 0;
-        padding-bottom: 3rem;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #ccc; /* Light gray background color */
-      }
+        body{
+            margin: 0;
+            padding-bottom: 3rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ccc;
+        }
 
-      #form {
-        background: #ffffcc; /* Slightly transparent white background */
-        padding: 0.5rem;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        height: 3.5rem; /* Increased height for the form */
-        box-sizing: border-box;
-        backdrop-filter: blur(10px);
-      }
+        #form{
+            background-color: #ffffcc;
+            padding: 0.5rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 3.5rem;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
 
-      #input {
-        border: 1px solid #1e4920;
-        padding: 0.75rem 1rem; /* Increased padding for the input */
-        flex-grow: 1;
-        border-radius: 2.5rem; /* Increased border-radius for the input */
-        margin-right: 0.5rem; /* Added margin between input and buttons */
-      }
+        #input{
+            border: 1px solid #1e4920;
+            padding: 0.75rem 1rem;
+            flex-grow: 1;
+            border-radius: 2.5rem;
+            margin-right: 0.5rem;
+        }
+        #input:focus{
+            outline: none;
+        }
 
-      #input:focus {
-        outline: none;
-      }
+        #form > button {
+            background-color: #388e3c;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin: 0;
+            border-radius: 3px;
+            outline: none;
+            color: #fff;
+            cursor: pointer;
+            margin-right: 10px;
+        }
 
-      #form > button {
-        background: #4caf50; /* Main green color */
-        border: none;
-        padding: 0.75rem 1.5rem; /* Increased padding for the buttons */
-        margin: 0;
-        border-radius: 3px;
-        outline: none;
-        color: #fff;
-        cursor: pointer;
-        margin-right: 10px;
-      }
+        #toggle-btn{
+            background-color: #388e3c;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin: 0;
+            border-radius: 3px;
+            outline: none;
+            color: #fff;
+            cursor: pointer;
+        }
 
-      #toggle-btn {
-        background: #388e3c; /* Darker shade of green for disconnect */
-        border: none;
-        padding: 0.75rem 1.5rem; /* Increased padding for the buttons */
-        margin: 0;
-        border-radius: 3px;
-        outline: none;
-        color: #fff;
-        cursor: pointer;
-      }
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
 
-      #messages {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
+        #messages > li{
+            padding: 0.5rem 1rem;
+        }
 
-      #messages > li {
-        padding: 0.5rem 1rem;
-      }
+        #messages > li:nth-child(odd){
+            background-color: #efefef;
+        }
+        #messages > li:nth-child(even){
+            background-color: #fff;
+        }
 
-      #messages > li:nth-child(odd) {
-        background: #efefef;
-      }
-      #messages > li:nth-child(even) {
-        background: #fff;
-      }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <ul id="messages"></ul>
     <form id="form" action="">
-      <input id="input" placeholder="Type your message..." autocomplete="off" />
-      <button type="submit">Send</button>
-      <button id="toggle-btn" type="button">Disconnect</button>
+        <input id="input" placeholder="Type your message..." autocomplete="off" />
+        <button type="submit">Send</button>
+        <button id="toggle-btn" type="button">Disconnect</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      const socket = io({
-        auth: {
-          serverOffset: 0,
-        },
-      });
+        const socket = io({
+            auth: {
+                serverOffset: 0
+            }
+        });
 
-      const form = document.getElementById("form");
-      const input = document.getElementById("input");
-      const message = document.getElementById("messages");
-      const disconnectBtn = document.getElementById("disconnect-btn");
-      const toggleBtn = document.getElementById("toggle-btn");
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+        const toggleBtn = document.getElementById('toggle-btn');
 
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (input.value) {
-          socket.emit("chat message", input.value);
-          input.value = "";
-        }
-      });
+        form.addEventListener('submit', (e)=>{
+            e.preventDefault();
+            if(input.value){
+                socket.emit('chat message', input.value);
+                input.value = "";
+            }
+        });
 
-      toggleBtn.addEventListener("click", () => {
-        if (socket.connected) {
-          socket.disconnect();
-          toggleBtn.textContent = "Connect";
-        } else {
-          socket.connect();
-          toggleBtn.textContent = "Disconnect";
-        }
-      });
+        toggleBtn.addEventListener("click", ()=>{
+            if(socket.connected){
+                socket.disconnect();
+                toggleBtn.textContent = "Connect";
+            } else{
+                socket.connect();
+                toggleBtn.textContent = "Disconnect";
+            }
+        })
 
-      socket.on("chat message", (msg, serverOffset) => {
-        const item = document.createElement("li");
-        item.textContent = msg;
-        message.insertAdjacentElement("beforeend", item);
-        socket.auth.serverOffset = serverOffset;
-      });
+        socket.on('chat message', (msg, serverOffset)=>{
+            const item = document.createElement('li');
+            item.textContent = msg;
+            messages.insertAdjacentElement("beforeend", item);
+            window.scrollTo(0, document.body.scrollHeight);
+            socket.auth.serverOffset = serverOffset;
+        })
     </script>
-  </body>
+</body>
 </html>
